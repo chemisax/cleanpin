@@ -16,21 +16,28 @@ CleanPin::CleanPin(int pin, int avgFrom, int numAvg) {
 }
 
 void CleanPin::update() {
-  _reads[_currentRead] = analogRead(_pin);
-  _currentRead = (_currentRead == 9) ? 0 : _currentRead+1;
-}
+  for (int i = 0; i < 10; i++)
+    _reads[i] = analogRead(_pin);
 
-int CleanPin::getRead() {
+  _prevRead = _read;
   int sum = 0;
   for (int i = 0; i < _numAvg; i++)
     sum += _reads[(_avgFrom-1)+i];
-  return (int)(sum/_numAvg);
+  _read = (int)(sum/_numAvg);
+}
+
+int CleanPin::getRead() {
+  return _read;
 }
 
 int CleanPin::getVar() {
-  int var = getRead();
-  if (var > 1000) return 1;
-  else if (var > 600 && var < 700) return 2;
-  else if(var < 20) return 3;
+
+  int diff = _read - _prevRead;
+  diff *= (diff < 0) ? -1 : 1;
+
+  if (diff > 1) return 0;
+  else if (_read > 1020) return 1;
+  else if (_read >= 510 && _read <= 511) return 2;
+  else if(_read < 5) return 3;
   else return 0;
 }

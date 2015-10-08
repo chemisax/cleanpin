@@ -19,6 +19,9 @@ class CleanPin {
     int _reads[10];
     int _avgFrom;
     int _numAvg;
+    int _read;
+    int _prevRead;
+    int _tolerance;
     int _currentRead;
 };
 
